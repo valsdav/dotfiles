@@ -1,0 +1,547 @@
+;; ### INSTALL PACKAGES ###
+;; Initialize package sources
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ("cselpa" . "https://elpa.thecybershadow.net/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+  ;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; #############################
+;; # Customizations
+;; Auto save files
+(setq auto-save-visited-file-name t)
+
+;; Disable menu bars
+(menu-bar-mode -1)
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 7)        ; Give some breathing room
+
+;; Remember and restore the last cursor location of opened files
+(save-place-mode 1)
+;; Don't pop up UI dialogs when prompting
+(setq use-dialog-box nil)
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+;;(setq auto-revert-remote-files 1)    
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+;; Save what you enter into minibuffer prompts
+(setq history-length 25)
+(savehist-mode 1)
+
+;; Package for multi-window easy other-window switch
+(use-package ace-window
+  :bind
+  (("M-o" . ace-window)))
+
+(use-package restclient)
+
+;; Make the modeline  cleaner
+(use-package delight)
+
+;;;; MODELINE
+(use-package powerline
+  :config
+  (powerline-default-theme)
+  (setq powerline-display-buffer-size nil)
+ )
+
+;; #MAIN THEME
+(use-package modus-themes
+  :ensure
+  :init
+  ;; Load the theme files before enabling a theme
+  (modus-themes-load-themes)
+  :config
+  ;; Load the theme of your choice:
+  (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
+   (defun toogle-change-theme-and-reset-powerline ()
+     (interactive)
+     (modus-themes-toggle)
+     (powerline-reset))
+
+   :bind
+   ("<f5>" . toogle-change-theme-and-reset-powerline)
+)
+
+
+;; Setup defaul font
+(defvar my-default-font-size 135)
+(defvar my-default-variable-font-size 135)
+;; Make frame transparency overridable
+(defvar my-frame-transparency '(90 . 90))
+(set-face-attribute 'default nil :font "Fira Code Retina" :height my-default-font-size)
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height my-default-font-size)
+;; Set the variable pitch face
+;;(set-face-attribute 'variable-pitch nil :font "Cantarell" :height my-default-variable-font-size :weight 'regular)
+
+;; Automatic font scaling
+(use-package hydra
+  :defer t)
+(defhydra hydra-text-scale (:timeout 6)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+;; Modify the text-scale-increase function to work on all the buffers
+(defadvice text-scale-increase (around all-buffers (arg) activate)
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      ad-do-it)))
+
+
+;; yes or no >>> y or n
+(fset 'yes-or-no-p 'y-or-n-p)
+;; no startup msg  
+(setq inhibit-startup-message t)
+;; Disable the beep and use instead a flash in the mode line
+(setq ring-bell-function
+      (lambda ()
+        (let ((orig-fg (face-foreground 'powerline-active0)))
+          (set-face-foreground 'powerline-active0 "#F2804F")
+          (run-with-idle-timer 0.1 nil
+                               (lambda (fg) (set-face-foreground 'powerline-active0 fg))
+                               orig-fg))))
+
+
+;; ### LINE Numbers
+(column-number-mode)
+(global-display-line-numbers-mode t)
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                eshell-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;; ## PARENTHESIS
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+;; Highlight matching brackets
+(setq show-paren-delay 0)
+(show-paren-mode 1)
+(defadvice show-paren-function (after my-echo-paren-matching-line activate)
+  "If a matching paren is off-screen, echo the matching line."
+  (let* ((cb (char-before (point)))
+         (matching-text (and cb
+                             (char-equal (char-syntax cb) ?\) )
+                             (blink-matching-open))))
+    (when matching-text
+      (setq matching-text (replace-regexp-in-string "Matches " "" matching-text))
+      (setq matching-text (replace-regexp-in-string "...{" "" matching-text))
+      (message "%s | %s..."
+               (save-excursion
+                 (search-backward matching-text)
+                 (what-line))
+               matching-text))))
+
+;; ;; autocompletion
+(use-package auto-complete
+  :delight
+  :config
+  (ac-config-default)
+  )
+;;(require 'auto-complete-config)
+
+
+;; ### SPELL CHECK ###
+;; flyspell dictionary
+(setq ispell-dictionary "en")
+
+
+;; ### PROGRAMMING ###
+;; .h files are c++ files
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+;; Indentation style
+(setq-default indent-tabs-mode nil)     
+(setq c-default-style "linux"
+      tab-width 2
+      c-basic-offset 2)
+(electric-pair-mode 'toggle)
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+
+
+;; ## Helper packages for completing and searhc (Ivy vs Helm)
+;; ## IVY CONFIG
+(use-package ivy
+  ;;:defer 0.1
+  :delight
+  :bind (("C-s" . swiper)
+         ("C-S-s" . swiper-thing-at-point)
+         ;;("C-r" . swiper)
+         ("C-c C-r" . ivy-resume)
+         ("C-x B" . ivy-switch-buffer-other-window)
+         ("C-c v" . 'ivy-push-view)
+         ("C-c V" . 'ivy-pop-view)
+         ("C-c C-SPC" . 'counsel-mark-ring)
+         :map ivy-minibuffer-map
+         ("C-j" . ivy-previous-line)
+         ("C-k" . ivy-next-line)
+         ("C-;" . ivy-alt-done)
+         :map ivy-switch-buffer-map
+         ("C-j" . ivy-previous-line)
+         ("C-k" . ivy-next-line)
+         ("C-;" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-d" . ivy-reverse-i-search-kill)
+         ("C-j" . ivy-previous-line)
+         ("C-k" . ivy-next-line)
+       )
+  :custom
+  (ivy-count-format "(%d/%d) ")
+  (ivy-use-virtual-buffers t)
+  :config (ivy-mode))
+
+
+;; Icons for ivy-rich
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :delight
+  :init (all-the-icons-ivy-rich-mode 1))
+
+(use-package ivy-rich
+  :ensure t
+  :delight
+  :config (ivy-rich-mode 1)
+
+  ;; abbreviate turns home into ~ (for example)
+  ;; buffers still only get the buffer basename
+  (setq ivy-virtual-abbreviate 'abbreviate
+        ivy-rich-path-style 'abbrev
+        ivy-rich-parse-remote-buffer nil ; ivy remote files do not hang
+))
+
+(use-package counsel
+  :after ivy
+  :delight
+  :config (counsel-mode))
+
+(use-package ivy-prescient
+  :after counsel
+  :custom
+  (ivy-prescient-enable-filtering nil)
+  :config
+  ;; Uncomment the following line to have sorting remembered across sessions!
+  (prescient-persist-mode 1)
+  (ivy-prescient-mode 1))
+
+
+;; ## Help with keybindings
+(use-package which-key
+  :init (which-key-mode)
+  :delight
+  :config
+  (setq which-key-idle-delay 1))
+
+
+
+;; #HELPFUL configuration
+;; Note that the built-in `describe-function' includes both functions
+;; and macros. `helpful-function' is functions only, so we provide
+;; `helpful-callable' as a drop-in replacement.
+;; for this in lisp modes.
+(use-package helpful
+  :bind (
+         ("C-h k" . helpful-key)
+         ("C-c H" . helpful-function)
+         ("C-h F" . helpful-function)
+         ("C-h C" . helpful-command))         
+  :config
+  (setq counsel-describe-function-function #'helpful-callable)
+  (setq counsel-describe-variable-function #'helpful-variable))
+
+
+
+(use-package projectile
+  :delight '(:eval (concat " " (projectile-project-name)))
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+;;  (when (file-directory-p "~/Projects/Code")
+  ;;  (setq projectile-project-search-path '("~/Projects/Code")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+;; #Magit for git
+(use-package magit
+  :commands magit-status
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(setq auth-sources '("~/.emacs.d/authinfo"))
+;; NOTE: Make sure to configure a GitHub token before using this package!
+;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+(use-package forge
+  :after magit)
+
+
+;; ### Multi-cursors
+(use-package multiple-cursors
+  :bind (("C-c s" . mc/mark-previous-like-this)
+         ("C-c d" . mc/mark-next-like-this)
+         ("C-c D" . mc/mark-all-like-this)
+         ("C-c C-p" . mc/mark-pop)
+         :map mc/keymap
+         ("<return>" . nil)
+         ))
+
+
+;; ;; ## Reload desktop also in TTY mode
+;; (desktop-save-mode 1)
+;; (setq desktop-restore-eager 6)
+;; (setq desktop-auto-save-timeout 40)
+;; (setq desktop-restore-forces-onscreen nil)
+;; (add-hook 'desktop-after-read-hook
+;;  (lambda ()
+;;    (frameset-restore
+;;     desktop-saved-frameset
+;;     :reuse-frames (eq desktop-restore-reuses-frames t)
+;;     :cleanup-frames (not (eq desktop-restore-reuses-frames 'keep))
+;;     :force-display desktop-restore-in-current-display
+;;     :force-onscreen desktop-restore-forces-onscreen)))
+
+
+;; ## KONSOLE KEYS
+;; Keys emulation for konsole terminal
+(require 'term-keys)
+(term-keys-mode t)
+(require 'term-keys-konsole)
+;; Generate the keys for konsolo configuration
+;; (with-temp-buffer
+
+;;   (insert (term-keys/konsole-keytab))
+;;   (append-to-file (point-min) (point-max) "~/.local/share/konsole/Emacs.keytab"))
+
+
+;; ### ORG MODE configuration
+(load-file "~/.emacs.d/org_config.el")
+
+;; Ibuffer group by perspective
+;; (add-hook 'ibuffer-hook
+;;           (lambda ()
+;;             (persp-ibuffer-set-filter-groups)
+;;             (unless (eq ibuffer-sorting-mode 'alphabetic)
+;;               (ibuffer-do-sort-by-alphabetic))))
+
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq
+     treemacs-is-never-other-window t
+     treemacs-persist-file  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+     treemacs-sorting 'mod-time-asc
+     treemacs-select-when-already-in-treemacs 'move-back)
+    
+    (treemacs-follow-mode t)            
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("<f8>"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+
+;; Perspectives
+(use-package perspective
+  :bind
+  (
+   ("C-x k" . persp-kill-buffer*)
+   ("C-x C-b" . persp-ibuffer)
+   ("C-x b" . persp-ivy-switch-buffer)) ;switch to counsel for the previous of the buffer
+  :config
+  (setq persp-state-default-file "~/.emacs.d/persp/persp-state" )
+  (setq persp-sort 'created)
+  ;;(add-hook 'kill-emacs-hook #'persp-state-save)
+  (persp-mode)
+  )
+
+;; Prefix for git conflit merging tool
+(setq smerge-command-prefix "\C-cv")
+
+;; Loading session
+(persp-state-load "~/.emacs.d/persp/persp-state")
+
+
+;; (use-package treemacs-perspective ;;treemacs-perspective if you use perspective.el vs. persp-mode
+;;   :after (treemacs perspective) ;;or perspective vs. persp-mode
+;;   :ensure t
+;;   :config
+;;   (treemacs-set-scope-type 'Perspectives)
+;;   (persp-mode))
+
+;; # GLOBAL KEY BINDINGS
+;; Set-keys after the loading of all the packages
+;; Keep ibuffer full buffer list at hand
+;;(global-set-key (kbd "C-x C-b") 'ibuffer);; Load iBuffer for buffer list
+(global-set-key (kbd "C-x C-B") 'ibuffer-other-window) ;; Load in a different window 
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline success warning error])
+ '(ansi-color-names-vectorb
+   ["gray35" "#a60000" "#005e00" "#813e00" "#0031a9" "#721045" "#00538b" "gray65"])
+ '(awesome-tray-mode-line-active-color "#0031a9")
+ '(awesome-tray-mode-line-inactive-color "#d7d7d7")
+ '(custom-safe-themes
+   '("7397cc72938446348521d8061d3f2e288165f65a2dbb6366bb666224de2629bb" "9f1d0627e756e58e0263fe3f00b16d8f7b2aca0882faacdc20ddd56a95acb7c2"))
+ '(exwm-floating-border-color "#888888")
+ '(flymake-error-bitmap '(flymake-double-exclamation-mark modus-themes-fringe-red))
+ '(flymake-note-bitmap '(exclamation-mark modus-themes-fringe-cyan))
+ '(flymake-warning-bitmap '(exclamation-mark modus-themes-fringe-yellow))
+ '(ibuffer-deletion-face 'modus-themes-mark-del)
+ '(ibuffer-filter-group-name-face 'modus-themes-pseudo-header)
+ '(ibuffer-formats
+   '((mark modified read-only locked " "
+           (name 35 35 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " " filename-and-process)
+     (mark " "
+           (name 16 -1)
+           " " filename)))
+ '(ibuffer-marked-face 'modus-themes-mark-sel)
+ '(ibuffer-saved-filter-groups
+   '(("coding"
+      ("Python"
+       (used-mode . python-mode))
+      ("C++"
+       (used-mode . c++-mode))
+      ("Scripts"
+       (file-extension . "sh"))
+      ("Org"
+       (used-mode . org-mode))
+      ("Latex"
+       (used-mode . latex-mode))
+      ("Dired"
+       (used-mode . dired-mode)))))
+ '(ibuffer-saved-filters
+   '(("programming"
+      (or
+       (derived-mode . prog-mode)
+       (mode . ess-mode)
+       (mode . compilation-mode)))
+     ("text document"
+      (and
+       (derived-mode . text-mode)
+       (not
+        (starred-name))))
+     ("TeX"
+      (or
+       (derived-mode . tex-mode)
+       (mode . latex-mode)
+       (mode . context-mode)
+       (mode . ams-tex-mode)
+       (mode . bibtex-mode)))
+     ("web"
+      (or
+       (derived-mode . sgml-mode)
+       (derived-mode . css-mode)
+       (mode . javascript-mode)
+       (mode . js2-mode)
+       (mode . scss-mode)
+       (derived-mode . haml-mode)
+       (mode . sass-mode)))
+     ("gnus"
+      (or
+       (mode . message-mode)
+       (mode . mail-mode)
+       (mode . gnus-group-mode)
+       (mode . gnus-summary-mode)
+       (mode . gnus-article-mode)))))
+ '(ibuffer-title-face 'default)
+ '(package-selected-packages
+   '(treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
+ '(pdf-view-midnight-colors '("#000000" . "#f8f8f8"))
+ '(tramp-inline-compress-start-size 1000000)
+ '(tramp-encoding-shell "/usr/bin/zsh")
+ '(vc-annotate-background nil)
+ '(vc-annotate-background-mode nil)
+ '(vc-annotate-color-map
+   '((20 . "#a60000")
+     (40 . "#721045")
+     (60 . "#8f0075")
+     (80 . "#972500")
+     (100 . "#813e00")
+     (120 . "#70480f")
+     (140 . "#5d3026")
+     (160 . "#184034")
+     (180 . "#005e00")
+     (200 . "#315b00")
+     (220 . "#005a5f")
+     (240 . "#30517f")
+     (260 . "#00538b")
+     (280 . "#093060")
+     (300 . "#0031a9")
+     (320 . "#2544bb")
+     (340 . "#0000c0")
+     (360 . "#5317ac")))
+ '(vc-annotate-very-old-color nil)
+ '(xterm-color-names
+   ["black" "#a60000" "#005e00" "#813e00" "#0031a9" "#721045" "#00538b" "gray65"])
+ '(xterm-color-names-bright
+   ["gray35" "#972500" "#315b00" "#70480f" "#2544bb" "#8f0075" "#30517f" "white"]))
+
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(powerline-active0 ((t (:background "#ffffff" :foreground "DodgerBlue2" :inverse-video t)))))
+
+;; Reset the powerline after setting the colors
+(powerline-reset)
+
