@@ -1,0 +1,331 @@
+Most useful Emacs bindings to remember.
+
+* Help
+  C-h C-h: help about help
+  C-h k:  describe command
+  C-h c: describe quickly which function is linked to the selected commands
+  C-h f: decribe function
+  C-h l: show last commands
+  C-h v: show content of variable
+  C-h w: show where is a command, which keys are linked to it
+  Prefix C-h: for example C-x 4 C-h to get all the keys binded to C-x 4
+  C-c H  : diplay help at point
+   
+* Moving around
+ M-<: top of buffer
+ M->: buttom of buffer
+ M-g g: move to certaint line
+ C-M-b move to previous sexpr
+ C-M-f move to next sexpr
+ C-M-p move previous group of parenthesis
+ C-M-n move next group of parenthesis
+ C-M-a begin of function block
+ C-M-e end of function block
+ M-r: move the point to center-top-bottom of the screen
+ C-l: move the text under the point to the center of current screen
+ C-l C-l: move the text under the point to top or bottom or center
+ C-up / M-{: backward by paragraph or equivalent
+ C-down/ M-}: down by paragraph or equivalent
+
+* Editing
+ C-/ Undo
+ C-x u: Undo
+ C-x f: set column size
+ M-q justify paragraph
+ M-; Comment region
+ C-x C-; comment line
+ M-/ complete the word withwords already used
+ M-d: kill word after point
+ M-DEL: kill word before point
+ C-k kill line after point
+ C-0 C-k: kill line before point
+ C-S-DEL: kill whole line
+ C-x DEL: kill back from point to the start of the sentence
+ M-k: kill from point to end of sentence (. + 2 spaces)
+ C-M-k: Append the kill to the previous kill
+ C-M-\ Indent region automatically
+ C-o: add new row
+ C-m: add new line
+ M-SPC: keep just one space
+ C-t: transpose characters
+ C-M-t: transpose sexp
+ C-x i: insert content of file after the point
+ C-M-o: split line at point with a newline
+ Revert the buffer content from file: M-x revert-buffer
+ 
+* Marks, copy and paste
+ C-SPC: mark
+ C-SPC C-SPC: set a mark in that point
+ C-u C-SPC: cycle to previous mark in the current buffer ring
+ C-c C-SPC: counsel-mark-ring: check mark ring in current buffer with ivy
+ C-x C-SPC cycle in the global mark ring
+ C-x C-x switch mark and point and select
+ M-w copy the region to kill ring
+ C-w to kill the region
+ C-y: yank (paste)
+ C-number C-y: yank back in the kill ring
+  
+** Regions and blocks
+M-d: kill word after point
+M-DEL: kill word before point
+M-@ Mark word (from point to end of word)
+M-h: mark paragraph/element
+C-M-SPC mark sexpr
+C-M-k: kills sexpr
+C-M-h: mark function
+C-x h: mark all buffer
+   
+* Search
+  C-s: forward search
+  Repeate to go to the next item, or DEL to go back
+  C-r: backward search
+  C-u C-s: Regex search
+  C-s then C-w: feed current word in the incremental search (in swiper do C-S M-j or C-S-S)
+  M-p/ M-n: move around in previous entries in the search minibuffer
+  M-%: search and replace (! replace all)
+  C-M-%: search and replace with regex (! replace all)
+  M-s . : feed current word under the point for search (i-search)
+  C-S-s: Feed work at point in Swiper search
+  
+  
+** Highlighting
+  M-s h .: Highlight the words under the point
+  M-s h l: Highlight line with regex
+  M-S h r: Highlight only regex matches
+  M-S h u: Remove highlight for a single regex match
+
+** Occurrences
+  The default occur system is a bit replaced by the swiper search, but it is useful for deeper searches
+  M-s o: extract occurrences with regex string in a separate buffer
+  C-u N M-S o: keep N lines around each occurrency
+  e: edit directly in the *occur* buffer
+  e C-x C-s: go to edit mode and then save --> it keeps the metadata
+  C-c C-c: exit editing mode
+  o: move cursor to the occurrence
+  C-o: move the buffer to the occurrence keeping the point in the occur buffer
+  M-g n: move to the next occurrence (without being in the buffer)
+  M-g p: move to previous occurrence (without being in the buffer)
+  To speed up, to select again other occurrences do:
+  M-g n C-x z and then z z z
+  g: refresh the occur buffer
+
+** References
+  M-S-/: find references for symbol at point in a folder
+  
+* Buffers
+  C-x b: open buffer in current window
+  C-x k: close buffer
+  C-x C-b: open buffer menu
+  C-x 4 b: open buffer in the other window
+  C-x 4 0: Close buffer
+  M-x ffpa: find-file-at-point
+** iBuffers:
+  m: mark
+  S: Save the marked buffers
+  A: View the marked buffers
+  V: Revert the marked buffers
+  D: Kill the marked buffers
+  d: mark for deletion
+  k: Remove the marked lines from buffer list without killing
+  x: Kill the buffers marked for deletion
+  / S: Save the groups
+  / P: Remove the group
+  / m: Filter by mode
+  / n: Filter by name
+  / c: Filter by content with regexp
+  / g: Create group with a name with the filtered buffers
+  / R Restore previous group
+  / X Delete previous groups
+  s a: sort alphabetically
+  s v: sort by last viewing time
+  / \: remove all active groups
+  / /: remove all filters
+  C-k, C-y to move the groups
+  
+* Windows:
+  C-x 0: Close current window
+  C-x o: Switch to other windows cyclically
+  C-x <right>/<left> arrows: switch to next buffer in the current window 
+  C-x 1: Close all others
+  C-x 2: Split current orizonatlly
+  C-x 3: Split vertically
+  C-x 4 f: Open file in the other window
+  C-x 4 C-o: Show buffer in the other window (not working
+  C-x 4 d: open files browser(dired) in the other window
+  C-x 4 0: kill buffer and window
+  Split window and open a file in it: C-x 3 C-x 4 f
+  Split window and open buffer list: C-x 3 C-x o C-x C-b
+  C-x { / }: Resize window
+  
+* Bookmarks
+  C-x r m: create a bookmark
+  C-x r b: Open a bookmark from the minibuffer
+  C-x r l: List bookmarks
+** Bookmarks menu
+   s: save list on file
+   o: open and move point
+   C-o: open and point stays in the bookmark list
+   m: mark for opening
+   v: open all marked bookmarks
+   d: mark for delection
+   x: deleted marked for deletion
+   u: unmark
+   l: open a bookmark and close others
+   r: rename bookmark
+
+* Meta-commands
+  Commands modifying the effect of other commands or redoing 
+** Repeate commands
+   C-number
+   C-u N
+   M-number
+** Add generic argument
+   C-u ARG
+** Repeat command
+   C-x z : and then repeat only z to redo again
+    
+* Minibuffer
+  M-n/M-p: move in the minibuffer history
+  C-r: search with regex in minibuffer history
+
+* Useful commands:
+M-x: execute command/function
+M-: eval some lisp code
+C-x C-e: eval expression
+* Dired
+  C-x d: open dired in current window
+  C-x 4 d: open dired in other window
+  +: create a new directory
+  ^: go up
+  o, C-o, to open in another window (usual thing for the cursor)
+  f,e,RET: to open
+  i : open subdirectory in the same folder
+  = : compare files
+  C-x [ / ] : Move of one folder
+  C : copy
+  R: Rename
+  s: sort by name/date
+  g: refresh
+  d: mark for deletion
+  x: delete flagged files for deletion
+  R: rename file o move multiple files
+  C: copy files 
+
+* Ivy/Swiper
+ Autocompletion and easier buffer switching with recentfile, buffers
+and views (saved groups of windows)
+
+  C-x B: switch buffer in the other window
+  C-x b: open ivy-switch-buffer which contains also recent files and saved views
+  C-c C-r: ivy-resume, in case the buffer was close by error
+  C-S-s: search with word at point
+  C-r: Reverse search of previous searched terms (It is not M-r in swiper)
+  
+** Ivy minibuffer options
+   C-n/C-p move in the candidates list
+   C-j/C-k: previous/next item in the list (user-defined)
+   C-m / RET / C-; : do selected action and exit (open buffer, occurency)
+   C-M-m: do selected action without exiting 
+   C-; : enter the directory or open candidate (ivy-alt-done)
+   C-d: kill the current buffer if in switch-buffer. Kill the reverse-search candidate.
+   M-n/M-p: next-previous element in the history
+   C-r: recursive search in the search terms history
+   M-j: **enter word** at point in the current pattern search (buffer/swiper)
+   M-i: Copy the current candidate in the minibuffer (useful to refine search)   
+   M-w: Copy the selected candidates in the kill ring   
+   S-SPC: restrict the search to the current candidates
+
+   You can save and restore views (window setups)
+   C-c v: save view
+   C-c V: pop and remove the view
+
+   M-o: Select an action and exit with it.
+   M-o: more options depending on the context (search file, buffer-list, swiper).
+   C-M-o: select an action to do but do not exit
+
+   C-c C-o: Stop completion and put candidated in a new buffer
+   Once a buffer is  created the current action is done with RET
+   o: to select the current action
+   RET: open the occurrence in the other window and move point
+   C-o: open the occurrence in the other window keeping focus
+   
+* Multiple cursors
+ Select a work/region/character and then
+  C-c d: select next match
+  C-c s: select previous match
+  C-c D: select all the matches
+  C-c C-p: put cursors on the marks in the mark ring
+  C-g: exit multi-cursor mode
+  C-': show only lines with cursors
+  RET: new line for all cursors
+  C-v: Move to next cursor
+  M-v: Move to previous cursor
+
+  Commands to run on single cursors or multiple ones are saved in the file
+  .emacs.d/mc-list.el
+  
+* Registers
+C-x r w: Save window configuration to register
+C-x r f: Save frameset configuration to register (works better with save-desktop mode for persistence)
+C-x r j: Jump to register
+C-x r SPC: Point to register
+
+* Projectile
+Handle projects withint emacs. Each folder with a .git inside or .projectile file is considered a project
+C-c p p: Switch project
+C-c p S: save all files in the project
+C-c p f: find file in project
+C-c p s g: Projectile grep
+C-c p s i: git grep
+C-c p b: Switch to buffer in project
+C-c p e: Recent files in the project
+
+* Emacs shell
+M-x shell: open a tty
+M-p/M-n: move in the history of commands
+M-r: reverse search in the command history
+C-r: continue searching back in the history
+
+* Useful procedures
+** Search something at point
+C-s then M-j to copy the work at point in the swiper search
+C-S-s: binded to swiper-thing-at-point directly 
+** Saving desktop
+M-x desktop-save : save the current desktop configuration in a directory
+M-x desktop-read: read the desktop configuration from a directory
+The desktop configuration saves buffer, windows and frameset registers 
+** Follow mode
+C-x 3; M-x follow-mode: the two windows scrolls togethere like a long window
+
+
+* Org mode
+M-S-RET: new checkbox
+M-RET: new Heading/list
+C-c C-p:  move to the previous visible heading
+C-c C-n: move to the next visible heading
+C-c C-t Change the TODO state of an item
+C-c C-, : enter a template 
+
+** Timestamps
+Schedule == Start to work in that moment
+Timestamp == Just put a time on it
+[ ] Inactive timestamps does not appear in the agenda
+** Clocks
+C-c C-x TAB or C-c C-x C-i: Start clock on current entry
+C-u C-c C-x C-i:  switch the clock to a recent task
+C-C C-x C-o: Stop current clock
+C-C C-x C-j: Jump to current clock
+C-c C-c  or C-c C-y:  recompute the clock
+C-c C-x C-x: restart the latest clocked clock. With a prefix it goes
+back in history
+C-c C-x C-q: Cancel current clock
+C-c C-x C-d: Display the total time for each subtree (goes away with
+C-c -C-c)
+l: in the agenda mode it shows the *log* mode with information about
+clocked entries
+** Code blocks
+C-c ' : edit code block
+C-c C-c: execute block
+** Sparse trees
+C-c / : toggle sparse tree selection that shows only matching parts of
+the file
