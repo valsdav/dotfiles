@@ -112,7 +112,7 @@
      ))
 
   (setq org-clock-persist 'history)
-  (org-clock-persistence-insinuatqe)
+  (org-clock-persistence-insinuate)
 
   (org-babel-do-load-languages
  'org-babel-load-languages
@@ -145,6 +145,7 @@
 
            (org-ql-block '(and (todo)
                                (tags "@work")
+                               (not (tags "meeting"))
                                (scheduled :to today)
                                )
                          ((org-ql-block-header "Scheduled until today")))
@@ -160,21 +161,30 @@
                              ;;(not (todo "HOLD"))
                              ;;(not (todo "NEXT"))
                              (tags "@work")
+                             (not (todo "MEETING"))
                              (priority "A" "B")
                              )
                          ((org-ql-block-header "High priority tasks")
                           (org-agenda-sorting-strategy '(priority-down))))
+
            
+           (org-ql-block '( and (todo)
+                            (tags "meeting")
+                            (ts :from today :to 7))
+                         ((org-ql-block-header "Meetings in next 7 days")
+                          (org-agenda-sorting-strategy '(timestamp-up))))
+           
+           (org-ql-block '(and (todo)
+                               (tags "inbox")
+                               )
+                         ((org-ql-block-header "Inbox" )))
+
            (org-ql-block '(and (todo)
                                (tags "email")
                                )
                        ((org-ql-block-header "Mails" )))
 
-           (org-ql-block '(and (todo)
-                               (tags "inbox")
-                               )
-                       ((org-ql-block-header "Inbox" )))
-           
+                 
            (org-ql-block '(and (clocked :on today)
                                ;; (ts :on today)
                                (tags "@work")
@@ -231,14 +241,18 @@
   (setq org-capture-templates
      `(("t" "Tasks")
        
-       ("tt" "Task to Inbox" entry (file+headline "~/org/Inbox.org" "Inbox")
-           "* TODO %?\n  Created: %U\n" :empty-lines 1)
+       ("tt" "Task to Inbox" entry (file+headline "~/org/Inbox.org" "Inbox") "* TODO %?")
 
        ("m" "Meetings")
        ("mo" "One-time meeting" entry (file+olp "~/org/Meetings.org" "Meetings" "One-time")
         "* MEETING %?\n %^T")
        ("mr" "Recurrent meeting" entry (file+olp "~/org/Meetings.org" "Meetings" "Recurrent")
         "* MEETING %?\n %^T")
+       ("mg" "General meeting" entry (file+olp "~/org/Meetings.org", "Inbox")
+        "* MEETING %?\n %^T")
+
+
+       ("M", "Mail" entry (file+headline "~/org/Mails.org" "Inbox")  "* TODO %? %^G")
 
        ("c" "Chats")
        ("cc" "Chat" entry (file+olp "~/org/Meetings.org" "Chats")  "* TODO %?\n %^T")
@@ -246,15 +260,10 @@
        ("csm", "Matteo" plain (file+olp "~/org/Meetings.org", "Chats","Students","Chats with Matteo")
         "" :prepend t :clock-in t :immediate-finish t)
 
-       ("M", "Mail" entry (file+headline "~/org/Mails.org" "Inbox")  "* TODO %? %^G")
-
        ("n" "Notes to current clock")
        ("nn" "Plain note" item (clock) "- %?")
        ("nl" "Link to current file " item (clock) "- %a")
        ("nc" "Link to current file + comment" item (clock) "- %?\n  %a")
-
-
-
 
        ))
 

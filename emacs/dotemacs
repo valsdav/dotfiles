@@ -324,9 +324,9 @@
 
 ;; ## KONSOLE KEYS
 ;; Keys emulation for konsole terminal
-(require 'term-keys)
-(term-keys-mode t)
-(require 'term-keys-konsole)
+;; (require 'term-keys)
+;; (term-keys-mode t)
+;; (require 'term-keys-konsole)
 ;; Generate the keys for konsolo configuration
 ;; (with-temp-buffer
 
@@ -395,12 +395,29 @@
   :config
   (setq persp-state-default-file "~/.emacs.d/persp/persp-state" )
   (setq persp-sort 'created)
-  ;;(add-hook 'kill-emacs-hook #'persp-state-save)
+  (add-hook 'kill-emacs-hook #'persp-state-save)
   (persp-mode)
   )
 
 ;; Prefix for git conflit merging tool
 (setq smerge-command-prefix "\C-cv")
+
+(use-package flycheck
+  :ensure t
+  ;;:init (global-flycheck-mode)
+ )
+
+;; TRAMP optimizations
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+(customize-set-variable 'tramp-use-ssh-controlmaster-options t) ;; nil to reuse connection
+(setq tramp-verbose 1)
+(setq projectile-mode-line "Projectile")
+
+(add-to-list 'directory-abbrev-alist
+             '("^/PocketCoffea" . "/ssh:dvalsecc@t3ui02.psi.ch:/work/dvalsecc/ttHbb/PocketCoffea/"))
 
 ;; Loading session
 (persp-state-load "~/.emacs.d/persp/persp-state")
@@ -436,6 +453,7 @@
  '(custom-safe-themes
    '("7397cc72938446348521d8061d3f2e288165f65a2dbb6366bb666224de2629bb" "9f1d0627e756e58e0263fe3f00b16d8f7b2aca0882faacdc20ddd56a95acb7c2"))
  '(exwm-floating-border-color "#888888")
+ '(fill-column 120)
  '(flymake-error-bitmap '(flymake-double-exclamation-mark modus-themes-fringe-red))
  '(flymake-note-bitmap '(exclamation-mark modus-themes-fringe-cyan))
  '(flymake-warning-bitmap '(exclamation-mark modus-themes-fringe-yellow))
@@ -502,11 +520,12 @@
        (mode . gnus-summary-mode)
        (mode . gnus-article-mode)))))
  '(ibuffer-title-face 'default)
+ '(org-duration-format '((special . h:mm)))
  '(package-selected-packages
-   '(treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
+   '(flycheck vue-mode treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
  '(pdf-view-midnight-colors '("#000000" . "#f8f8f8"))
- '(tramp-inline-compress-start-size 1000000)
  '(tramp-encoding-shell "/usr/bin/zsh")
+ '(tramp-inline-compress-start-size 1000000)
  '(vc-annotate-background nil)
  '(vc-annotate-background-mode nil)
  '(vc-annotate-color-map
