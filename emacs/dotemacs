@@ -176,6 +176,9 @@
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 
+(use-package highlight-indent-guides
+ :hook  (prog-mode . highlight-indent-guides-mode))
+
 ;; ## Helper packages for completing and searhc (Ivy vs Helm)
 ;; ## IVY CONFIG
 (use-package ivy
@@ -418,10 +421,7 @@
 
 (add-to-list 'directory-abbrev-alist
              '("^/PocketCoffea" . "/ssh:dvalsecc@t3ui02.psi.ch:/work/dvalsecc/ttHbb/PocketCoffea/"))
-
-;; Loading session
-(persp-state-load "~/.emacs.d/persp/persp-state")
-
+ 
 
 ;; (use-package treemacs-perspective ;;treemacs-perspective if you use perspective.el vs. persp-mode
 ;;   :after (treemacs perspective) ;;or perspective vs. persp-mode
@@ -457,6 +457,7 @@
  '(flymake-error-bitmap '(flymake-double-exclamation-mark modus-themes-fringe-red))
  '(flymake-note-bitmap '(exclamation-mark modus-themes-fringe-cyan))
  '(flymake-warning-bitmap '(exclamation-mark modus-themes-fringe-yellow))
+ '(highlight-indent-guides-method 'character)
  '(ibuffer-deletion-face 'modus-themes-mark-del)
  '(ibuffer-filter-group-name-face 'modus-themes-pseudo-header)
  '(ibuffer-formats
@@ -522,8 +523,9 @@
  '(ibuffer-title-face 'default)
  '(org-duration-format '((special . h:mm)))
  '(package-selected-packages
-   '(flycheck vue-mode treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
+   '(snakemake-mode yaml-mode highlight-indent-guides flycheck vue-mode treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
  '(pdf-view-midnight-colors '("#000000" . "#f8f8f8"))
+ '(persp-sort 'name)
  '(tramp-encoding-shell "/usr/bin/zsh")
  '(tramp-inline-compress-start-size 1000000)
  '(vc-annotate-background nil)
@@ -564,3 +566,6 @@
 ;; Reset the powerline after setting the colors
 (powerline-reset)
 
+
+;; Loading session
+(persp-state-load "~/.emacs.d/persp/persp-state")
