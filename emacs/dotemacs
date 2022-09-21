@@ -253,7 +253,6 @@
   (setq which-key-idle-delay 1))
 
 
-
 ;; #HELPFUL configuration
 ;; Note that the built-in `describe-function' includes both functions
 ;; and macros. `helpful-function' is functions only, so we provide
@@ -268,7 +267,6 @@
   :config
   (setq counsel-describe-function-function #'helpful-callable)
   (setq counsel-describe-variable-function #'helpful-variable))
-
 
 
 (use-package projectile
@@ -309,7 +307,6 @@
          ("<return>" . nil)
          ))
 
-
 ;; ;; ## Reload desktop also in TTY mode
 ;; (desktop-save-mode 1)
 ;; (setq desktop-restore-eager 6)
@@ -348,44 +345,51 @@
 ;;               (ibuffer-do-sort-by-alphabetic))))
 
 
-(use-package treemacs
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
-  (progn
-    (setq
-     treemacs-is-never-other-window t
-     treemacs-persist-file  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-     treemacs-sorting 'mod-time-asc
-     treemacs-select-when-already-in-treemacs 'move-back)
+;; (use-package treemacs
+;;   :ensure t
+;;   :defer t
+;;   :init
+;;   (with-eval-after-load 'winum
+;;     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+;;   :config
+;;   (progn
+;;     (setq
+;;      treemacs-is-never-other-window t
+;;      treemacs-persist-file  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+;;      treemacs-sorting 'mod-time-asc
+;;      treemacs-select-when-already-in-treemacs 'move-back)
     
-    (treemacs-follow-mode t)            
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("<f8>"   . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
+;;     (treemacs-follow-mode t)            
+;;     (treemacs-filewatch-mode t)
+;;     (treemacs-fringe-indicator-mode 'always))
+;;   :bind
+;;   (:map global-map
+;;         ("M-0"       . treemacs-select-window)
+;;         ("C-x t 1"   . treemacs-delete-other-windows)
+;;         ("<f8>"   . treemacs)
+;;         ("C-x t d"   . treemacs-select-directory)
+;;         ("C-x t B"   . treemacs-bookmark)
+;;         ("C-x t C-t" . treemacs-find-file)
+;;         ("C-x t M-t" . treemacs-find-tag)))
 
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+;; (use-package treemacs-projectile
+;;   :after (treemacs projectile)
+;;   :ensure t)
 
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+;; (use-package treemacs-icons-dired
+;;   :hook (dired-mode . treemacs-icons-dired-enable-once)
+;;   :ensure t)
 
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
+;; (use-package treemacs-magit
+;;   :after (treemacs magit)
+;;   :ensure t)
+
+;; (use-package treemacs-perspective ;;treemacs-perspective if you use perspective.el vs. persp-mode
+;;   :after (treemacs perspective) ;;or perspective vs. persp-mode
+;;   :ensure t
+;;   :config
+;;   (treemacs-set-scope-type 'Perspectives)
+;;   (persp-mode))
 
 
 ;; Perspectives
@@ -416,20 +420,10 @@
               vc-ignore-dir-regexp
               tramp-file-name-regexp))
 (customize-set-variable 'tramp-use-ssh-controlmaster-options t) ;; nil to reuse connection
+(setq tramp-auto-save-directory "~/.emacs.d/tramp-autosave")
 (setq tramp-verbose 1)
 (setq projectile-mode-line "Projectile")
-
-(add-to-list 'directory-abbrev-alist
-             '("^/PocketCoffea" . "/ssh:dvalsecc@t3ui02.psi.ch:/work/dvalsecc/ttHbb/PocketCoffea/"))
  
-
-;; (use-package treemacs-perspective ;;treemacs-perspective if you use perspective.el vs. persp-mode
-;;   :after (treemacs perspective) ;;or perspective vs. persp-mode
-;;   :ensure t
-;;   :config
-;;   (treemacs-set-scope-type 'Perspectives)
-;;   (persp-mode))
-
 ;; # GLOBAL KEY BINDINGS
 ;; Set-keys after the loading of all the packages
 ;; Keep ibuffer full buffer list at hand
@@ -438,6 +432,85 @@
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
+
+(setq smerge-command-prefix "\C-cv")
+
+;; CODE FOLDING
+;; (defun toggle-fold ()
+;;   (interactive)
+;;   (save-excursion
+;;     (end-of-line)
+;;     (hs-toggle-hiding)))
+
+;; (use-package origami)
+;; (define-key global-map (kbd "C-<tab>") 'origami-mode-map)
+;; (define-prefix-command 'origami-mode-map)
+;; (define-key origami-mode-map (kbd "o") 'origami-open-node)
+;; (define-key origami-mode-map (kbd "O") 'origami-open-node-recursively)
+;; (define-key origami-mode-map (kbd "c") 'origami-close-node)
+;; (define-key origami-mode-map (kbd "C") 'origami-close-node-recursively)
+;; (define-key origami-mode-map (kbd "a") 'origami-toggle-node)
+;; (define-key origami-mode-map (kbd "A") 'origami-recursively-toggle-node)
+;; (define-key origami-mode-map (kbd "R") 'origami-open-all-nodes)
+;; (define-key origami-mode-map (kbd "M") 'origami-close-all-nodes)
+;; (define-key origami-mode-map (kbd "v") 'origami-show-only-node)
+;; (define-key origami-mode-map (kbd "k") 'origami-previous-fold)
+;; (define-key origami-mode-map (kbd "j") 'origami-forward-fold)
+;; (define-key origami-mode-map (kbd "x") 'origami-reset)
+
+;;Hideshow for outline in code
+(use-package hideshow
+   :hook ((prog-mode . hs-minor-mode)))
+
+(defun hs-cycle (&optional level)
+  (interactive "p")
+  (let (message-log-max
+        (inhibit-message t))
+    (if (= level 1)
+        (pcase last-command
+          ('hs-cycle
+           (hs-hide-level 1)
+           (setq this-command 'hs-cycle-children))
+          ('hs-cycle-children
+           ;; TODO: Fix this case. `hs-show-block' needs to be
+           ;; called twice to open all folds of the parent
+           ;; block.
+           (save-excursion (hs-show-block))
+           (hs-show-block)
+           (setq this-command 'hs-cycle-subtree))
+          ('hs-cycle-subtree
+           (hs-hide-block))
+          (_
+           (if (not (hs-already-hidden-p))
+               (hs-hide-block)
+             (hs-hide-level 1)
+             (setq this-command 'hs-cycle-children))))
+      (hs-hide-level level)
+      (setq this-command 'hs-hide-level))))
+
+(defun hs-global-cycle ()
+    (interactive)
+    (pcase last-command
+      ('hs-global-cycle
+       (save-excursion (hs-show-all))
+       (setq this-command 'hs-global-show))
+      (_ (hs-hide-all))))
+
+(global-set-key (kbd "C-<tab>") 'hs-cycle)
+(global-set-key (kbd "C-M-<tab>") 'hs-global-cycle)
+
+;; Avy paakge for jumping around
+(use-package avy)
+(bind-keys :prefix-map avy-map
+           :prefix "C-c j"
+           ("c" . avy-goto-char)
+           ("l" . avy-goto-line)
+           ("w" . avy-goto-word-or-subword-1)
+           ("z" . avy-zap-to-char)
+           ("Z" . avy-zap-up-to-char)
+           ("o" . avy-org-goto-heading-timer)
+           ("O". avy-org-refile-as-child))
+(global-set-key (kbd "M-j") 'avy-goto-char-timer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -523,7 +596,7 @@
  '(ibuffer-title-face 'default)
  '(org-duration-format '((special . h:mm)))
  '(package-selected-packages
-   '(snakemake-mode yaml-mode highlight-indent-guides flycheck vue-mode treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
+   '(origami snakemake-mode yaml-mode highlight-indent-guides flycheck vue-mode treemacs-perspective treemacs-magit treemacs-icons-dired treemacs-projectile treemacs restclient ace-window calfw calfw-org delight ein perspective org-clock-csv term-keys counsel-projectile counsel-etags forge org-analyzer multi-cursors Multi-cursors ivy-prescient auto-package-update rainbow-mode powerline mode-line-bell ivy-hydra helpful all-the-icons-ivy-rich projectile counsel ivy-rich which-key zone-rainbow rainbow-delimiters rainbow-identifiers vs-light-theme request-deferred request magit auto-complete modus-themes modus-vivendi-theme multiple-cursors))
  '(pdf-view-midnight-colors '("#000000" . "#f8f8f8"))
  '(persp-sort 'name)
  '(tramp-encoding-shell "/usr/bin/zsh")
